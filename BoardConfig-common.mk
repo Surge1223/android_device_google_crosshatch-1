@@ -46,7 +46,7 @@ BOARD_KERNEL_CMDLINE += service_locator.enable=1
 BOARD_KERNEL_CMDLINE += cgroup.memory=nokmem
 BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1
 BOARD_KERNEL_CMDLINE += usbcore.autosuspend=7
-BOARD_KERNEL_CMDLINE += loop.max_part=7
+BOARD_KERNEL_CMDLINE += loop.max_part=7 androidboot.dtb_idx=1
 BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1d84000.ufshc
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
 TARGET_KERNEL_CLANG_COMPILE := true
@@ -54,22 +54,29 @@ TARGET_KERNEL_SOURCE := kernel/google/bluecross
 TARGET_KERNEL_CONFIG := b1c1_defconfig
 BOARD_KERNEL_IMAGE_NAME := Image.lz4-dtb
 
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+BOARD_BOOTIMG_HEADER_VERSION := 2
 BOARD_KERNEL_BASE        := 0x00000000
 BOARD_KERNEL_PAGESIZE    := 4096
 ifeq ($(filter-out crosshatch_kasan blueline_kasan, $(TARGET_PRODUCT)),)
 BOARD_KERNEL_OFFSET      := 0x80000
 BOARD_KERNEL_TAGS_OFFSET := 0x02500000
 BOARD_RAMDISK_OFFSET     := 0x02700000
-BOARD_MKBOOTIMG_ARGS     := --kernel_offset $(BOARD_KERNEL_OFFSET) --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
+BOARD_DTB_OFFSET         := 0x01000000
+BOARD_MKBOOTIMG_ARGS     := \
+	--kernel_offset $(BOARD_KERNEL_OFFSET) \
+        --dtb $(PRODUCT_OUT)/dtb.img \
+	--ramdisk_offset $(BOARD_RAMDISK_OFFSET) \
+	--dtb_offset $(BOARD_DTB_OFFSET) \
+	--tags_offset $(BOARD_KERNEL_TAGS_OFFSET) \
+	--header_version $(BOARD_BOOTIMG_HEADER_VERSION)
+
 else
 BOARD_KERNEL_TAGS_OFFSET := 0x01E00000
 BOARD_RAMDISK_OFFSET     := 0x02000000
 endif
 
-#BOARD_INCLUDE_DTB_IN_BOOTIMG := true
-BOARD_BOOT_HEADER_VERSION := 1
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-
+TARGET_NEEDS_DTBIMAGE := true
 # DTBO partition definitions
 TARGET_NEEDS_DTBOIMAGE := true
 BOARD_DTBOIMG_PARTITION_SIZE := 8388608

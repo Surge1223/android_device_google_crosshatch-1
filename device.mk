@@ -146,10 +146,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.cp_system_other_odex=1
 
 AB_OTA_PARTITIONS += \
-    boot \
     system \
     vbmeta \
-    dtbo \
     vendor
 
 BUILD_WITHOUT_VENDOR := true
